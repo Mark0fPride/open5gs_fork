@@ -972,6 +972,33 @@ ogs_nas_5gmm_cause_t gmm_handle_identity_response(amf_ue_t *amf_ue,
     ogs_nas_5gs_mobile_identity_header_t *mobile_identity_header = NULL;
 
 //TODO
+    ran_ue = ran_ue_find_by_id(amf_ue->ran_ue_id);
+    ogs_assert(ran_ue);
+
+    mobile_identity = &identity_response->mobile_identity;
+
+    mobile_identity_header = mobile_identity->buffer;
+
+    if(mobile_identity_header->type != OGS_NAS_5GS_MOBILE_IDENTITY_SUCI){
+        ogs_error("SUPI FORMAT UNIMPLEMENTED");
+        return OGS_ERROR;
+    }
+    mobile_identity_suci = (ogs_nas_5gs_mobile_identity_suci_t *)mobile_identity->buffer;
+
+    if( mobile_identity_suci->protection_scheme_id == OGS_PROTECTION_SCHEME_NULL ||
+        mobile_identity_suci->protection_scheme_id == OGS_PROTECTION_SCHEME_PROFILE_A ||
+        mobile_identity_suci->protection_scheme_id == OGS_PROTECTION_SCHEME_PROFILE_B)
+
+      return OGS_5GMM_CAUSE_SEMANTICALLY_INCORRECT_MESSAGE;
+
+    ogs_nas_to_plmn_id(&amf_ue->home_plmn_id, &mobile_identity_suci->nas_plmn_id);
+
+    gmm_cause = gmm_cause_from_access_control(&amf_ue->home_plmn_id);
+
+    if(gmm_cause != OGS_5GMM_CAUSE_REQUEST_ACCEPTED)
+        return gmm_cause;
+
+    amf_ue_set_suci(amf_ue, mobile_identity);
 
     return OGS_5GMM_CAUSE_REQUEST_ACCEPTED;
 }
