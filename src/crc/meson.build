@@ -17,9 +17,20 @@
 
 libcrc_sources = files('crc.c', 'crc.h')
 
+libcrcmetrics_sources = files('crc_metrics_example.c', 'crc_metrics_example.h','metrics.h','metrics.c')
+
+libcrcmetrics = static_library('crc_metrics',
+    sources : libcrcmetrics_sources,
+    include_directories : include_directories('.'),
+    dependencies : [libmetrics_dep],
+    install : false
+)
+
 libcrc = static_library('crc',
     sources : libcrc_sources,
     include_directories : include_directories('.'),
     install : false
 )
+
+
 
