@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
 testunit_unit_sources = files('''
     abts-main.c
     proto-message-test.c
@@ -25,15 +26,19 @@ testunit_unit_sources = files('''
     sbi-message-test.c
     security-test.c
     crash-test.c
+    crc-test.c
 '''.split())
 
 testunit_unit_exe = executable('unit',
     sources : testunit_unit_sources,
     c_args : [testunit_core_cc_flags, sbi_cc_flags],
+    include_directories : srcinc,
     dependencies : [libs1ap_dep,
                     libgtp_dep,
                     libngap_dep,
                     libnas_eps_dep,
-                    libsbi_dep])
+                    libsbi_dep],
+    link_with : libcrc  
 
+)
 test('unit', testunit_unit_exe, is_parallel : false, suite: 'unit')
